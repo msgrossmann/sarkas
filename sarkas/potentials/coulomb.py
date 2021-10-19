@@ -48,6 +48,9 @@ def update_params(potential, params):
         alpha_times_rcut = - (potential.pppm_alpha_ewald * potential.rc) ** 2
         params.pppm_pp_err = 2.0 * np.exp(alpha_times_rcut) / np.sqrt(potential.rc)
         params.pppm_pp_err *= np.sqrt(params.total_num_ptcls) * params.a_ws ** 2 / np.sqrt(params.pbox_volume)
+    elif potential.method == "FMM":
+        params.force_error = 0.0  # TODO: Implement force error in FMM case
+
 
 
 @njit

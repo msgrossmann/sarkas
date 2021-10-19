@@ -10,8 +10,8 @@ if get_ipython().__class__.__name__ == 'ZMQInteractiveShell':
     from tqdm import tqdm_notebook as tqdm
 else:
     from tqdm import tqdm
-# import fmm3dpy as fmm
-# from sarkas.potentials import force_pm, force_pp
+import fmm3dpy as fmm
+from sarkas.potentials import force_pm, force_pp
 
 
 class Integrator:
@@ -305,6 +305,8 @@ class Integrator:
             IO class for saving dumps.
 
         """
+        checkpoint.dump('production', ptcls, 500)
+
         for it in tqdm(range(it_start, self.production_steps), disable=(not self.verbose)):
 
             # Move the particles and calculate the potential

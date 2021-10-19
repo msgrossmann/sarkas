@@ -5,6 +5,7 @@ import numpy as np
 from sarkas.potentials.force_pm import force_optimized_green_function as gf_opt
 from sarkas.potentials import force_pm, force_pp
 import fdint
+import fmm3dpy as fmm
 
 
 class Potential:
@@ -105,7 +106,6 @@ class Potential:
         self.pbox_lengths = 0.0
         self.box_volume = 0.0
         self.pbox_volume = 0.0
-        self.rs = 0.0
         self.fourpie0 = 0.0
         self.QFactor = 0.0
         self.total_net_charge = 0.0
@@ -433,26 +433,26 @@ class Potential:
 
         self.force_error = params.force_error
 
-    # def update_fmm(ptcls, params):
-    #     """
-    #
-    #     Parameters
-    #     ----------
-    #     ptcls
-    #     params
-    #
-    #     Returns
-    #     -------
-    #
-    #     """
-    #
-    #     if params.potential.type == 'Coulomb':
-    #         out_fmm = fmm.lfmm3d(eps=1.0e-07, sources=np.transpose(ptcls.pos), charges=ptcls.charges, pg=2)
-    #     elif params.potential.type == 'Yukawa':
-    #         out_fmm = fmm.hfmm3d(eps=1.0e-05, zk=1j / params.lambda_TF, sources=np.transpose(ptcls.pos),
-    #                          charges=ptcls.charges, pg=2)
-    #
-    #     potential_energy = ptcls.charges @ out_fmm.pot.real * 4.0 * np.pi / params.fourpie0
-    #     ptcls.acc = - np.transpose(ptcls.charges * out_fmm.grad.real / ptcls.mass) / params.fourpie0
-    #
-    #     return potential_energy
+    def update_fmm(self, ptcls):
+        """
+
+        Parameters
+        ----------
+        ptcls
+        params
+
+        Returns
+        -------
+
+        """
+
+        if self.type.lower() == 'coulomb':
+            out_fmm = fmm.lfmm3d(eps=1.0e-07, sources=np.transpose(ptcls.pos), charges=ptcls.charges, pg=2)
+        elif self.type.lower() == 'yukawa':
+            out_fmm = fmm.hfmm3d(eps=1.0e-05, zk=1j / params.lambda_TF, sources=np.transpose(ptcls.pos),
+                             charges=ptcls.charges, pg=2)
+
+        potential_energy = ptcls.charges @ out_fmm.pot.real * 4.0 * np.pi / ptcls.fourpie0
+        ptcls.acc = - np.transpose(ptcls.charges * out_fmm.grad.real / ptcls.masses) / ptcls.fourpie0
+
+        return potential_energy
